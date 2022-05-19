@@ -1,0 +1,21 @@
+﻿@using Microsoft.Extensions.Options
+@using PruebaPaypal.Models.Paypal
+@inject IOptions<PaypalApiSetting> pSetting
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<div id="paypal-button" style="width: 50%"></div>
+
+<script>
+paypal.Button.render({
+ style: {
+ size: 'responsive'
+ }
+}, '#paypal-button');
+</script>
