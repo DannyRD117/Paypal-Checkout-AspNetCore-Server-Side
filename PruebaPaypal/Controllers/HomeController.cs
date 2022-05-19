@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PayPalCheckoutSdk.Orders;
 using PruebaPaypal.Models;
-using PruebaPaypal.Models.Paypal;
 using System.Diagnostics;
 
 namespace PruebaPaypal.Controllers
