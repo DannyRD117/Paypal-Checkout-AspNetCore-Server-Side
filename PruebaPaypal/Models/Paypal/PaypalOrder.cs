@@ -25,16 +25,30 @@ namespace PruebaPaypal.Models.Paypal
         public string Method { get; set; }
     }
 
-    public class Amount
-    {
-        public string Currency_code { get; set; }
-        public string Value { get; set; }
-    }
-
     public class PurchaseUnit
     {
         public Amount Amount { get; set; }
         public string Description { get; set; }
+        public List<Items> Items { get; set; }
+    }
+
+    public class Items
+    {
+        public string Name { get; set; }
+        public Amount Unit_amount { get; set; }
+        public string Quantity { get; set; }
+    }
+
+    public class Amount
+    {
+        public string Currency_code { get; set; }
+        public string Value { get; set; }
+        public Breakdown Breakdown { get; set; }
+    }
+
+    public class Breakdown
+    {
+        public Amount Item_total { get; set; }
     }
 
     public class ApplicationContext

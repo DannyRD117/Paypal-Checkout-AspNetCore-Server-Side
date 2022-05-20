@@ -26,6 +26,33 @@ namespace PruebaPaypal.Controllers
                 var authToken = Encoding.ASCII.GetBytes($"{userName}:{passwd}");
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authToken));
 
+                //Creacion de orden simple
+
+                //var orden = new PaypalOrder()
+                //{
+                //    Intent = "CAPTURE",
+                //    Purchase_units = new List<PurchaseUnit>() {
+
+                //        new PurchaseUnit() {
+
+                //            Amount = new Amount() {
+                //                Currency_code = "USD",
+                //                Value = "10"
+                //            },
+                //            Description = "Prueba"
+                //        }
+                //    },
+                //    Application_context = new ApplicationContext()
+                //    {
+                //        Brand_name = "Libreria Colibri",
+                //        Landing_page = "NO_PREFERENCE",
+                //        User_action = "PAY_NOW", //Accion para que paypal muestre el monto de pago
+                //        Return_url = "https://localhost:7004/Checkout/Success",// cuando se aprovo la solicitud del cobro
+                //        Cancel_url = "https://localhost:7004/Checkout/Cancel"// cuando cancela la operacion
+                //    }
+                //};
+
+                //Creacion de orden indicando items
 
                 var orden = new PaypalOrder()
                 {
@@ -36,9 +63,40 @@ namespace PruebaPaypal.Controllers
 
                             Amount = new Amount() {
                                 Currency_code = "USD",
-                                Value = "10"
+                                Value = "70",
+                                Breakdown = new Breakdown()
+                                {
+                                    Item_total = new Amount()
+                                    {
+                                        Currency_code="USD",
+                                        Value ="70"
+                                    }
+                                }
                             },
-                            Description = "Prueba"
+                            Description = "Prueba",
+                            Items = new List<Items>
+                            {
+                                new Items()
+                                {
+                                    Name = "Item 1",
+                                    Unit_amount = new Amount()
+                                    {
+                                        Currency_code = "USD",
+                                        Value = "10"
+                                    },
+                                    Quantity = "1"
+                                },
+                                new Items()
+                                {
+                                    Name = "Item 2",
+                                    Unit_amount = new Amount()
+                                    {
+                                        Currency_code = "USD",
+                                        Value = "30"
+                                    },
+                                    Quantity = "2"
+                                }
+                            }
                         }
                     },
                     Application_context = new ApplicationContext()
