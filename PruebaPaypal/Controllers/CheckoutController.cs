@@ -1,46 +1,100 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-//using Newtonsoft.Json;
+using Microsoft.Extensions.Options;
 using PruebaPaypal.Models.Paypal;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
 
 namespace PruebaPaypal.Controllers
 {
     public class CheckoutController : Controller
     {
+        private readonly PaypalSettings _config;
+        private readonly PaypalClient _paypalClient;
+        public CheckoutController(IOptions<PaypalSettings> config, PaypalClient paypalClient)
+        {
+            _config = config.Value;
+            _paypalClient = paypalClient;
+            
+        }
         public async Task<IActionResult> Paypal()
         {
-            bool status = false;
-            string result = string.Empty;
 
-            using (var client = new HttpClient())
+            
+            var accesstoken = await _paypalClient.GetToken(_config.ClientID, _config.SecretID);
+            if(accesstoken != null)
             {
+                //    //Creacion de orden simple
 
-                //INGRESA TUS CREDENCIALES AQUI -> CLIENT ID - SECRET
-                var userName = "AXuHiPGbTuM4DL_SCyBa5ff9gTTfzuvFiE3vwbN_cxgpOK5j5AZTyYkb6vwHFyopLoSsVzDX0GiJbdIE";
-                var passwd = "EDJG7YLpWoSyteDDYlypr23AjXzVOMNpfla2d70NCHS3wBRbIl81SmOXxjCFj8l2Tvd42fWey5IqEijQ";
+                //    //var order = new Order()
+                //    //{
+                //    //    Intent = "CAPTURE",
+                //    //    Purchase_units = new List<PurchaseUnit>() {
 
-                client.BaseAddress = new Uri("https://api-m.sandbox.paypal.com");
+                //    //        new PurchaseUnit() {
 
-                var authToken = Encoding.ASCII.GetBytes($"{userName}:{passwd}");
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authToken));
+                //    //            Amount = new Amount() {
+                //    //                Currency_code = "USD",
+                //    //                Value = "10"
+                //    //            },
+                //    //            Description = "Prueba"
+                //    //        }
+                //    //    },
+                //    //    Application_context = new ApplicationContext()
+                //    //    {
+                //    //        Brand_name = "Libreria Colibri",
+                //    //        Landing_page = "NO_PREFERENCE",
+                //    //        User_action = "PAY_NOW", //Accion para que paypal muestre el monto de pago
+                //    //        Return_url = "https://localhost:7004/Checkout/Success",// cuando se aprovo la solicitud del cobro
+                //    //        Cancel_url = "https://localhost:7004/Checkout/Cancel"// cuando cancela la operacion
+                //    //    }
+                //    //};
 
 
-                var orden = new PaypalOrder()
+                //Creacion de orden indicando items
+
+                var order = new Order()
                 {
                     Intent = "CAPTURE",
                     Purchase_units = new List<PurchaseUnit>() {
 
-                        new PurchaseUnit() {
+                            new PurchaseUnit() {
 
-                            Amount = new Amount() {
-                                Currency_code = "USD",
-                                Value = "10"
-                            },
-                            Description = "Prueba"
-                        }
-                    },
+                                Amount = new Amount() {
+                                    Currency_code = "USD",
+                                    Value = "70",
+                                    Breakdown = new Breakdown()
+                                    {
+                                        Item_total = new Amount()
+                                        {
+                                            Currency_code="USD",
+                                            Value ="70"
+                                        }
+                                    }
+                                },
+                                Description = "Prueba",
+                                Items = new List<Items>
+                                {
+                                    new Items()
+                                    {
+                                        Name = "Item 1",
+                                        Unit_amount = new Amount()
+                                        {
+                                            Currency_code = "USD",
+                                            Value = "10"
+                                        },
+                                        Quantity = "1"
+                                    },
+                                    new Items()
+                                    {
+                                        Name = "Item 2",
+                                        Unit_amount = new Amount()
+                                        {
+                                            Currency_code = "USD",
+                                            Value = "30"
+                                        },
+                                        Quantity = "2"
+                                    }
+                                }
+                            }
+                        },
                     Application_context = new ApplicationContext()
                     {
                         Brand_name = "Libreria Colibri",
@@ -50,63 +104,30 @@ namespace PruebaPaypal.Controllers
                         Cancel_url = "https://localhost:7004/Checkout/Cancel"// cuando cancela la operacion
                     }
                 };
-
-
-                var json = JsonSerializer.Serialize(orden,
-                    new JsonSerializerOptions()
-                    {
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                        WriteIndented = true
-                    });
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var httpResponse = await client.PostAsync("/v2/checkout/orders", content);
-
-                if (httpResponse.IsSuccessStatusCode)
+                var orderResult = await _paypalClient.CreateOrder(order, accesstoken);
+                if (orderResult != null)
                 {
-                    result = await httpResponse.Content.ReadAsStringAsync();
-                }
-
+                    return Redirect(orderResult.Links[1].Href);
+                }             
             }
-
-            var orderResult = JsonSerializer.Deserialize<OrderResult>(result,
-                new JsonSerializerOptions()
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-            return Redirect(orderResult.Links[1].Href);
+            return RedirectToAction("Cancel");           
         }
 
         [HttpGet]
         public async Task<IActionResult> Success(string token)
         {
-            bool status = false;
-            string result = string.Empty;
-
-            using (var client = new HttpClient())
+            var accesstoken = await _paypalClient.GetToken(_config.ClientID, _config.SecretID);
+            if(accesstoken != null)
             {
-
-                //INGRESA TUS CREDENCIALES AQUI -> CLIENT ID - SECRET
-                var userName = "AXuHiPGbTuM4DL_SCyBa5ff9gTTfzuvFiE3vwbN_cxgpOK5j5AZTyYkb6vwHFyopLoSsVzDX0GiJbdIE";
-                var passwd = "EDJG7YLpWoSyteDDYlypr23AjXzVOMNpfla2d70NCHS3wBRbIl81SmOXxjCFj8l2Tvd42fWey5IqEijQ";
-
-                client.BaseAddress = new Uri("https://api-m.sandbox.paypal.com");
-
-                var authToken = Encoding.ASCII.GetBytes($"{userName}:{passwd}");
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authToken));
-
-                var content = new StringContent("{}", Encoding.UTF8, "application/json");
-
-                var httpResponse = await client.PostAsync($"v2/checkout/orders/{token}/capture", content);
-
-                if (httpResponse.IsSuccessStatusCode)
+                var result = await _paypalClient.CaptureOrder(accesstoken, token);
+                if (result)
                 {
-                    result = await httpResponse.Content.ReadAsStringAsync();
+                    return View();
                 }
-
             }
-            return View();
+            return RedirectToAction("Cancel");   
         }
+
         [HttpGet]
         public async Task<IActionResult> Cancel()
         {

@@ -4,12 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>87607297-e4ef-478d-b45d-95ae731b905d</UserSecretsId>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="PayPalCheckoutSdk" Version="1.0.4" />
-    <PackageReference Include="PayPalHttp" Version="1.0.1" />
-    <PackageReference Include="Stripe.net" Version="39.111.0" />
-  </ItemGroup>
 
 </Project>

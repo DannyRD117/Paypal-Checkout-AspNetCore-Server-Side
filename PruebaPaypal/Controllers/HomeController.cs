@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PayPalCheckoutSdk.Orders;
 using PruebaPaypal.Models;
-using PruebaPaypal.Models.Paypal;
 using System.Diagnostics;
 
 namespace PruebaPaypal.Controllers
@@ -9,6 +7,7 @@ namespace PruebaPaypal.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+
 
         public HomeController(ILogger<HomeController> logger)
         {
