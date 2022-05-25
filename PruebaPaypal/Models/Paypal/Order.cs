@@ -2,7 +2,7 @@
 
 namespace PruebaPaypal.Models.Paypal
 {
-    public class PaypalOrder
+    public class Order
     {
         public string Intent { get; set; }
         public List<PurchaseUnit> Purchase_units { get; set; }
@@ -59,4 +59,15 @@ namespace PruebaPaypal.Models.Paypal
         public string Return_url { get; set; }
         public string Cancel_url { get; set; }
     }
+
+    public class AccessToken
+    {
+        public string scope { get; set; }
+        public string access_token { get; set; }
+        public string token_type { get; set; }
+        public string app_id { get; set; }
+        public int expires_in { get; set; }
+        public string nonce { get; set; }
+    }
+
 }

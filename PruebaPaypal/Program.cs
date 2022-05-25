@@ -4,6 +4,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.Configure<PaypalSettings>(builder.Configuration.GetSection("Paypal"));
+builder.Services.AddHttpClient<PaypalClient>("Paypal", conf =>
+{
+    conf.BaseAddress = new Uri("https://api-m.sandbox.paypal.com");
+});
 
 var app = builder.Build();
 
